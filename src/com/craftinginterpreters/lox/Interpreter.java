@@ -74,6 +74,24 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 if (left instanceof String && right instanceof String) {
                     return (String) left + (String) right;
                 }
+                if (left instanceof String) {
+                    if (right instanceof Double) {
+                        Double doubledRight = (Double) right;
+                        boolean hasDecimal = doubledRight != doubledRight.intValue();
+                        if (!hasDecimal) return  (String) left + doubledRight.intValue();
+
+                        return (String) left + (double) right;
+                    }
+                }
+                if (left instanceof Double) {
+                    if (right instanceof String) {
+                        Double doubledLeft = (Double) left;
+                        boolean hasDecimal = doubledLeft != doubledLeft.intValue();
+                        if (!hasDecimal) return  doubledLeft.intValue() + (String) right;
+
+                        return (double) left + (String) right;
+                    }
+                }
                 break;
             case GREATER:
                 checkNumberOperands(expr.operator, left, right);
@@ -132,7 +150,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return environment.get(expr.name);
     }
 
-    private Object evaluate(Expr expr) {
+    public Object evaluate(Expr expr) {
         return expr.accept(this);
     }
 
@@ -172,7 +190,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return a.equals(b);
     }
 
-    private String stringify(Object object) {
+    public String stringify(Object object) {
         if (object == null) return "nil";
 
         if (object instanceof Double) {

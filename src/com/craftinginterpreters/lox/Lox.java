@@ -26,7 +26,7 @@ public class Lox {
 
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        run(new String(bytes, Charset.defaultCharset()));
+        run(new String(bytes, Charset.defaultCharset()), false);
         if (hadError) System.exit(65);
         if (hadRuntimeError) System.exit(70);
     }
@@ -39,12 +39,12 @@ public class Lox {
             System.out.print("> ");
             String line = reader.readLine();
             if (line == null) break;
-            run(line);
+            run(line, true);
             hadError = false;
         }
     }
 
-    private static void run(String source) {
+    private static void run(String source, boolean REPLMode) {
         Scanner scanner =  new Scanner(source);
         List<Token> tokens =  scanner.scanTokens();
 
@@ -52,7 +52,15 @@ public class Lox {
         List<Stmt> statements = parser.parse();
 
         if (hadError) return;
-        interpreter.interpret(statements);
+
+        if (statements.size() == 1 && statements.get(0) instanceof Stmt.Expression) {
+            Stmt.Expression exprStmt = (Stmt.Expression) statements.get(0);
+            Object value = interpreter.evaluate(exprStmt.expression);
+            System.out.println(interpreter.stringify(value));
+        } else {
+            interpreter.interpret(statements);
+        }
+
     }
 
     static void error(int line, String message) {
