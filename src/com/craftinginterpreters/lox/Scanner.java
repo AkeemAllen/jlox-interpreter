@@ -61,15 +61,19 @@ class Scanner {
             case '*': addToken(TokenType.STAR); break;
             case '!':
                 addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+                advance();
                 break;
             case '=':
                 addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+                advance();
                 break;
             case '<':
                 addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+                advance();
                 break;
             case '>':
                 addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+                advance();
                 break;
             case '/':
                 if (match('/')) {
